@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import axios from 'axios';
 
-const API_URL = 'http://13.201.127.30:9092';
+const API_URL = 'http://13.200.250.53:9092';
 
 function App() {
   const [file, setFile] = useState(null);
