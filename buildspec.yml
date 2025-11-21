@@ -1,0 +1,39 @@
+version: 0.2
+
+env:
+  variables:
+    ACCOUNT_ID: "741448934261"
+    AWS_REGION: "ap-south-1"
+    REPO_NAME: "frontend"
+
+phases:
+  install:
+    commands:
+      - echo Installing npm dependencies...
+      - npm install
+
+  build:
+    commands:
+      - echo Building React app...
+      - npm run build
+
+  pre_build:
+    commands:
+      - echo Logging into Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com)
+
+  post_build:
+    commands:
+      - echo Building Docker image...
+      - docker build -t $REPO_NAME .
+
+      - echo Tagging Docker image...
+      - docker tag $REPO_NAME:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:latest
+
+      - echo Pushing Docker image to ECR...
+      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_NAME:latest
+
+artifacts:
+  files:
+    - '**/*'
